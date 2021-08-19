@@ -2,7 +2,7 @@
 // It will be used by the Solidity compiler to validate its version.
 // "SPDX-License-Identifier: UNLICENSED"
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.8.0;
 
 import "./Impersonate.sol";
 

@@ -1,6 +1,6 @@
 // We import Chai to use its asserting functions here.
-const { expect } = require("chai");
-const assert = require('assert');
+import { ethers } from "hardhat";
+import { expect } from "chai";
 const ZERO = ethers.constants.AddressZero;
 
 // Game where only the owner can do stuff
@@ -9,7 +9,7 @@ describe("Game contract", function () {
   // You can nest describe calls to create subsections.
   describe("Initial game", function () {
     let Game;
-    let gameContract;
+    let gameContract: any;
 
     // regular tests in describe block
     // dao owns now describe
@@ -17,12 +17,11 @@ describe("Game contract", function () {
 
     before(async function () {
       Game = await ethers.getContractFactory("Game");
-      [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
-
       gameContract = await Game.deploy();
     });
 
     it("game owner is msg.sender", async function () {
+      const [owner, ...addrs] = await ethers.getSigners();
       expect(await gameContract.owner()).to.equal(owner.address)
     });
 
@@ -61,6 +60,7 @@ describe("Game contract", function () {
     });
 
     it("addr1 is not owner", async function () {
+      const [owner, addr1, ...addrs] = await ethers.getSigners();
       expect(await gameContract.owner()).to.not.equal(addr1.address);
     });
 
@@ -81,6 +81,7 @@ describe("Game contract", function () {
     // });
 
     it("msg.sender can't increment", async function () {
+      const [owner, addr1, ...addrs] = await ethers.getSigners();
       expect(await gameContract.whoami()).to.equal(owner.address);
       // connect addr1
       gameContract = gameContract.connect(addr1);
