@@ -21,7 +21,7 @@ describe("Game contract", function () {
     });
 
     it("game owner is msg.sender", async function () {
-      const [owner, ...addrs] = await ethers.getSigners();
+      const [owner] = await ethers.getSigners();
       expect(await gameContract.owner()).to.equal(owner.address)
     });
 
@@ -37,13 +37,13 @@ describe("Game contract", function () {
     });
 
 
-    it("game owner is now dao", async function () {
+    it.skip("game owner is now dao", async function () {
       const DAO_ADDRESS = await gameContract.DAO_ADDRESS();
       await gameContract.setOwner(DAO_ADDRESS);
       expect(await gameContract.owner()).to.equal(DAO_ADDRESS);
     });
 
-    it("dao increments count from 1 to 2", async function () {
+    it.skip("dao increments count from 1 to 2", async function () {
       // DAO is owner
       const DAO_ADDRESS = await gameContract.DAO_ADDRESS();
       expect(await gameContract.owner()).to.equal(DAO_ADDRESS);
