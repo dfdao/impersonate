@@ -15,12 +15,19 @@ contract Impersonate {
 
     // no Constructor
 
-    function impersonateMe(address impersonator) public {
-      // msg.sender allows impersonator to impersonate them
-      require(msg.sender != impersonator, 'cannot impersonate self');
-      impersonations[msg.sender] = impersonator;
+    // lookup for who is impersonating msg.sender
+    function _getImpersonator() public view returns (address) {
+      // will be msg.sender if no one is impersonating msg.sender
+      return impersonations[msg.sender] != address(0) ? impersonations[msg.sender] : msg.sender;
+    }
+    
+    // msg.sender allows impersonator to impersonate them
+    function impersonateMe(address newImpersonator) internal {
+      require(msg.sender != newImpersonator, 'cannot impersonate self');
+
+      impersonations[msg.sender] = newImpersonator;
       // NOTE: currently only allows player to impersonate 1 address at a time.
-      emit ImpersonationOccurred(msg.sender, impersonator);
+      emit ImpersonationOccurred(msg.sender, newImpersonator);
     }
 
     // general lookup for who can impersonating who. 
@@ -29,9 +36,5 @@ contract Impersonate {
       return impersonations[player];
     }
 
-    // lookup for who is impersonating msg.sender
-    function _getImpersonator() public view returns (address) {
-      // will be msg.sender if no one is impersonating msg.sender
-      return impersonations[msg.sender] != address(0) ? impersonations[msg.sender] : msg.sender;
-    }
+
 }
