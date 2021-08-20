@@ -8,19 +8,13 @@ pragma solidity ^0.8.0;
 contract Impersonate {
     // Some string type variables to identify the token.
     // The `public` modifier makes a variable readable from outside the contract.
+    // TODO: understand indexed better
     event ImpersonationOccurred(address indexed player, address indexed impersonator);
 
     mapping(address => address) impersonations;
 
-    /**
-     * Contract initialization.
-     *
-     * The `constructor` is executed only once when the contract is created.
-     */
-    /* constructor() {
-      impersonations[msg.sender] = DAO_ADDRESS; // sender impersonates the dao
-    } */
-
+    // no Constructor
+    
     function impersonateMe(address impersonator) public {
       // msg.sender allows impersonator to impersonate them
       impersonations[msg.sender] = impersonator;

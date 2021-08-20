@@ -9,17 +9,23 @@ describe('Impersonate', function () {
     // different describe block for each state.
         let impersonate: Impersonate; 
         let owner: SignerWithAddress;
+        let dao: SignerWithAddress; // , dao// remove later: gameContract.connect(dao)
 
     // will execute before each test
     beforeEach(async function () {
         const ImpersonateFactory = await ethers.getContractFactory("Impersonate");
         impersonate = await ImpersonateFactory.deploy() as Impersonate;
         await impersonate.deployed();
-        [owner] = await ethers.getSigners();
+        [owner, dao] = await ethers.getSigners();
     });
 
     it('owner should be _getImpersonator', async function () {
         expect(await impersonate._getImpersonator()).to.equal(owner.address);
+    })
+
+    it('dao should now be _getImpersonator', async function () {
+        impersonate.impersonateMe(dao.address);
+        expect(await impersonate._getImpersonator()).to.equal(dao.address);
     })
 
 });
