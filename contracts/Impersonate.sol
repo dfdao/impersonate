@@ -14,16 +14,17 @@ contract Impersonate {
     mapping(address => address) impersonations;
 
     // no Constructor
-    
+
     function impersonateMe(address impersonator) public {
       // msg.sender allows impersonator to impersonate them
+      require(msg.sender != impersonator, 'cannot impersonate self');
       impersonations[msg.sender] = impersonator;
       // NOTE: currently only allows player to impersonate 1 address at a time.
       emit ImpersonationOccurred(msg.sender, impersonator);
     }
 
     // general lookup for who can impersonating who. 
-    // If return == address(0), player can't impersonate anyone.
+    // If return == address(0), player isn't impersonate anyone.
     function isImpersonating(address player) public view returns (address) {
       return impersonations[player];
     }

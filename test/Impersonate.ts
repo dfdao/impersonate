@@ -22,14 +22,21 @@ describe('Impersonate', function () {
         expect(await impersonate._getImpersonator()).to.equal(owner.address);
     })
 
-    it('owner should be allowed to set _getImpersonator', async function () {
+    it('owner should be allowed to set _getImpersonator to dao', async function () {
+        // TODO: What is this functionality? Why multiple awaits?
         let impersonateReceipt = await impersonate.impersonateMe(dao.address);
         await impersonateReceipt.wait();
         expect(await impersonate._getImpersonator()).to.equal(dao.address);
     })
 
-    it("non owner cannot call impersonateMe", async function () {
-        await expect(impersonate.connect(dao).impersonateMe(dao.address)).to.be.revertedWith('_getImpersonator is not owner');
+    it('impersonateMe emits ImpersonationOccurred event', async function () {
+        await expect(impersonate.impersonateMe(dao.address))
+        .to.emit(impersonate, 'ImpersonationOccurred').
+        withArgs(owner.address, dao.address); 
+    })
+  
+    it("owner cannot impersonate self", async function () {
+        await expect(impersonate.connect(owner).impersonateMe(owner.address)).to.be.revertedWith('cannot impersonate self');
     });
 
 });
