@@ -1,100 +1,100 @@
 // We import Chai to use its asserting functions here.
-import { ethers } from "hardhat";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
-const ZERO = ethers.constants.AddressZero;
+import { Signer } from "ethers";
+import { ethers } from "hardhat";
+import { Game } from '../typechain'
 
-// Game where only the owner can do stuff
-// b/c contract inherits from
-describe("Game contract", function () {
-  // You can nest describe calls to create subsections.
-  describe("Initial game", function () {
-    let Game;
-    let gameContract: any;
+describe("Game ", function () {
 
-    // regular tests in describe block
-    // dao owns now describe
-    // be very clear who is owner, who is msg.sender
+  describe("Game owner no change", function () {
+    let game: Game; 
+    let owner: SignerWithAddress;
+    let dao: SignerWithAddress;
 
+    // will execute before the first test
     before(async function () {
-      Game = await ethers.getContractFactory("Game");
-      gameContract = await Game.deploy();
+      const GameFactory = await ethers.getContractFactory("Game");
+      game = await GameFactory.deploy() as Game;
+      await game.deployed();
+      [owner, dao] = await ethers.getSigners();
     });
 
-    it("game owner is msg.sender", async function () {
-      const [owner] = await ethers.getSigners();
-      expect(await gameContract.owner()).to.equal(owner.address)
+    it("owner is game.owner()", async function () {
+      expect(await game.owner()).to.equal(owner.address)
     });
 
     it("owner increments count from 0 to 1", async function () {
-      expect(await gameContract.count()).to.equal(0)
+      expect(await game.count()).to.equal(0)
 
-      const incrementTx = await gameContract.increment();
+      const incrementTx = await game.increment();
 
       // wait until the transaction is mined
       await incrementTx.wait();
 
-      expect(await gameContract.count()).to.equal(1)
+      expect(await game.count()).to.equal(1)
+    });
+
+    it("dao is not game.owner()", async function () {
+      expect(await game.owner()).to.not.equal(dao.address)
+    });
+
+    it("dao cannot change game.owner", async function () {
+      game = game.connect(dao); // dao is now connected to contract
+      expect(await game.whoami()).to.equal(dao.address);
+      await expect(game.setOwner(dao.address)).to.be.revertedWith('_getImpersonator is not owner');
     });
 
 
-    it.skip("game owner is now dao", async function () {
-      const DAO_ADDRESS = await gameContract.DAO_ADDRESS();
-      await gameContract.setOwner(DAO_ADDRESS);
-      expect(await gameContract.owner()).to.equal(DAO_ADDRESS);
+  });
+
+  describe("Game owner change to dao", function () {
+    let game: Game; 
+    let owner: SignerWithAddress;
+    let dao: SignerWithAddress; 
+
+    // will execute before the first test
+    before(async function () {
+      const GameFactory = await ethers.getContractFactory("Game");
+      game = await GameFactory.deploy() as Game;
+      await game.deployed();
+      [owner, dao] = await ethers.getSigners();
     });
 
-    it.skip("dao increments count from 1 to 2", async function () {
+    it("owner is game.owner()", async function () {
+      expect(await game.owner()).to.equal(owner.address)
+    });
+
+    it("owner increments count from 0 to 1", async function () {
+      expect(await game.count()).to.equal(0)
+
+      const incrementTx = await game.increment();
+
+      // wait until the transaction is mined
+      await incrementTx.wait();
+
+      expect(await game.count()).to.equal(1)
+    });
+
+    it("game owner is now dao", async function () {
+      await game.setOwner(dao.address);
+      expect(await game.owner()).to.equal(dao.address);
+    });
+
+    it("dao increments count from 1 to 2", async function () {
+
       // DAO is owner
-      const DAO_ADDRESS = await gameContract.DAO_ADDRESS();
-      expect(await gameContract.owner()).to.equal(DAO_ADDRESS);
+      expect(await game.owner()).to.equal(dao.address);
 
       // count is 1
-      expect(await gameContract.count()).to.equal(1)
+      expect(await game.count()).to.equal(1)
 
-      const incrementTx = await gameContract.increment();
+      const incrementTx = await game.increment();
 
       // wait until the transaction is mined
       await incrementTx.wait();
 
-      expect(await gameContract.count()).to.equal(2)
-    });
-
-    it("addr1 is not owner", async function () {
-      const [owner, addr1, ...addrs] = await ethers.getSigners();
-      expect(await gameContract.owner()).to.not.equal(addr1.address);
-    });
-
-    // it("msg.sender can't increment", async function () {
-    //   expect(await gameContract.whoami()).to.equal(owner.address);
-    //   // connect addr1
-    //   gameContract = gameContract.connect(addr1);
-    //
-    //   expect(await gameContract.whoami()).to.equal(addr1.address);
-    //
-    //   try {
-    //     await gameContract.increment();
-    //     // expect(true).to.be.false;
-    //   } catch(err) {
-    //     expect(err.message).to.equal(err.message);
-    //   }
-    //
-    // });
-
-    it("msg.sender can't increment", async function () {
-      const [owner, addr1, ...addrs] = await ethers.getSigners();
-      expect(await gameContract.whoami()).to.equal(owner.address);
-      // connect addr1
-      gameContract = gameContract.connect(addr1);
-
-      expect(await gameContract.whoami()).to.equal(addr1.address);
-
-      try {
-        await gameContract.increment();
-        // expect(true).to.be.false;
-      } catch(err) {
-        expect(err.message).to.equal(err.message);
-      }
-
+      expect(await game.count()).to.equal(2)
     });
   });
 
