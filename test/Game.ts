@@ -9,15 +9,17 @@ describe("Game ", function () {
 
   describe("Game owner no change", function () {
     let game: Game; 
+    let daoGame: Game;
     let owner: SignerWithAddress;
     let dao: SignerWithAddress;
 
     // will execute before the first test
     before(async function () {
+      [owner, dao] = await ethers.getSigners();
       const GameFactory = await ethers.getContractFactory("Game");
       game = await GameFactory.deploy() as Game;
       await game.deployed();
-      [owner, dao] = await ethers.getSigners();
+      daoGame = game.connect(dao);
     });
 
     it("owner is game.owner()", async function () {
@@ -40,11 +42,9 @@ describe("Game ", function () {
     });
 
     it("dao cannot change game.owner", async function () {
-      game = game.connect(dao); // dao is now connected to contract
-      expect(await game.whoami()).to.equal(dao.address);
-      await expect(game.setOwner(dao.address)).to.be.revertedWith('_getImpersonator is not owner');
+      expect(await daoGame.whoami()).to.equal(dao.address);
+      await expect(daoGame.setOwner(dao.address)).to.be.revertedWith('_getImpersonator is not owner');
     });
-
 
   });
 
@@ -55,10 +55,10 @@ describe("Game ", function () {
 
     // will execute before the first test
     before(async function () {
+      [owner, dao] = await ethers.getSigners();
       const GameFactory = await ethers.getContractFactory("Game");
       game = await GameFactory.deploy() as Game;
       await game.deployed();
-      [owner, dao] = await ethers.getSigners();
     });
 
     it("owner is game.owner()", async function () {
