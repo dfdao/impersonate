@@ -4,12 +4,11 @@ import { Signer } from "ethers";
 import { ethers } from "hardhat";
 import { Impersonate } from '../typechain'
 
-// Mocha testing framework w/ Chai expect
+// Waffle Mocha testing framework w/ Chai expect
 describe('Impersonate', function () {
-    // different describe block for each state.
         let impersonate: Impersonate; 
         let owner: SignerWithAddress;
-        let dao: SignerWithAddress; // , dao// remove later: gameContract.connect(dao)
+        let dao: SignerWithAddress; 
 
     // will execute before each test
     beforeEach(async function () {
