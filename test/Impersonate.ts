@@ -22,7 +22,7 @@ describe('Impersonate', function () {
         expect(await impersonate._getImpersonator()).to.equal(owner.address);
     })
 
-    it('dao should now be _getImpersonator', async function () {
+    it('owner should be allowed to set _getImpersonator', async function () {
         let impersonateReceipt = await impersonate.impersonateMe(dao.address);
         await impersonateReceipt.wait();
         expect(await impersonate._getImpersonator()).to.equal(dao.address);
