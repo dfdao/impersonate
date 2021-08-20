@@ -40,57 +40,44 @@ describe("Game ", function () {
       expect(await game.owner()).to.not.equal(dao.address)
     });
 
-    it("dao cannot change game.owner", async function () {
+    it("owner can set setOwner", async function () {
+      await game.setOwner(dao.address);
+      expect(await game.owner()).to.equal(dao.address);
+    });
+
+    it("dao cannot set owner", async function () {
       expect(await daoGame.whoami()).to.equal(dao.address);
       await expect(daoGame.setOwner(dao.address)).to.be.revertedWith('_getImpersonator is not owner');
     });
 
   });
 
-  describe("Game owner change to dao", function () {
-    let game: Game; 
+  describe("Game owner is dao", function () {
+    let daoGame: Game; 
     let owner: SignerWithAddress;
     let dao: SignerWithAddress; 
 
     beforeEach(async function () {
       [owner, dao] = await ethers.getSigners();
       const GameFactory = await ethers.getContractFactory("Game");
-      game = await GameFactory.deploy() as Game;
+      const game = await GameFactory.deploy() as Game;
       await game.deployed();
+      await game.setOwner(dao.address);
+      daoGame = game.connect(dao);
     });
 
-    it("owner is game.owner()", async function () {
-      expect(await game.owner()).to.equal(owner.address)
+    it("owner is dao", async function () {
+      expect(await daoGame.owner()).to.equal(dao.address)
     });
 
-    it("owner increments count from 0 to 1", async function () {
-      expect(await game.count()).to.equal(0)
+    it("dao increments count from 0 to 1", async function () {
 
-      const incrementTx = await game.increment();
+      const incrementTx = await daoGame.increment();
 
       // wait until the transaction is mined
       await incrementTx.wait();
 
-      expect(await game.count()).to.equal(1)
-    });
-
-    it("game owner is now dao", async function () {
-      await game.setOwner(dao.address);
-      expect(await game.owner()).to.equal(dao.address);
-    });
-
-    it("dao increments count from 1 to 2", async function () {
-      await game.setOwner(dao.address);
-
-      // DAO is owner
-      expect(await game.owner()).to.equal(dao.address);
-
-      const incrementTx = await game.connect(dao).increment();
-
-      // wait until the transaction is mined
-      await incrementTx.wait();
-
-      expect(await game.count()).to.equal(1)
+      expect(await daoGame.count()).to.equal(1)
     });
   });
 
