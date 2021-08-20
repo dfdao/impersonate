@@ -13,8 +13,7 @@ describe("Game ", function () {
     let owner: SignerWithAddress;
     let dao: SignerWithAddress;
 
-    // will execute before the first test
-    before(async function () {
+    beforeEach(async function () {
       [owner, dao] = await ethers.getSigners();
       const GameFactory = await ethers.getContractFactory("Game");
       game = await GameFactory.deploy() as Game;
@@ -53,8 +52,7 @@ describe("Game ", function () {
     let owner: SignerWithAddress;
     let dao: SignerWithAddress; 
 
-    // will execute before the first test
-    before(async function () {
+    beforeEach(async function () {
       [owner, dao] = await ethers.getSigners();
       const GameFactory = await ethers.getContractFactory("Game");
       game = await GameFactory.deploy() as Game;
@@ -82,19 +80,17 @@ describe("Game ", function () {
     });
 
     it("dao increments count from 1 to 2", async function () {
+      await game.setOwner(dao.address);
 
       // DAO is owner
       expect(await game.owner()).to.equal(dao.address);
 
-      // count is 1
-      expect(await game.count()).to.equal(1)
-
-      const incrementTx = await game.increment();
+      const incrementTx = await game.connect(dao).increment();
 
       // wait until the transaction is mined
       await incrementTx.wait();
 
-      expect(await game.count()).to.equal(2)
+      expect(await game.count()).to.equal(1)
     });
   });
 
