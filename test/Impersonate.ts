@@ -28,4 +28,8 @@ describe('Impersonate', function () {
         expect(await impersonate._getImpersonator()).to.equal(dao.address);
     })
 
+    it("non owner cannot call impersonateMe", async function () {
+        await expect(impersonate.connect(dao).impersonateMe(dao.address)).to.be.revertedWith('_getImpersonator is not owner');
+    });
+
 });
