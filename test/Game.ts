@@ -79,7 +79,7 @@ describe("Game ", function () {
  
   });
 
-  describe("Game owner is dao", function () {
+  describe("Dao is impersonating", function () {
     let game: Game;
     let daoGame: Game; 
     let owner: SignerWithAddress;
