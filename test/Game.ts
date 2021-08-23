@@ -63,7 +63,7 @@ describe("Game ", function () {
       expect(await game.impersonator()).to.equal(dao.address);
     });
 
-    it("owner can impersonate dao, then randomPlayer", async function () {
+    it("owner can set dao as impersonator, then randomPlayer", async function () {
       await game.impersonateMe(dao.address);
       expect(await game.impersonator()).to.equal(dao.address);
 
