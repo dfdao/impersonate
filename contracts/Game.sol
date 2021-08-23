@@ -10,7 +10,6 @@ contract Game is Impersonate {
 
     uint256 public count = 0;
 
-    address public impersonator; // Game can only have one impersonator
 
     constructor () {
       impersonator = _getImpersonator(); // should be deployer msg.sender to start.
