@@ -8,23 +8,23 @@ import "./Impersonate.sol";
 
 contract Game is Impersonate {
 
-    uint256 public count = 0;
+    mapping(address => uint256) public score;
 
+    constructor () {}
 
-    constructor () {
-      impersonator = _getImpersonator(); // should be deployer msg.sender to start.
-    }
-
-    function impersonateMe (address newImpersonator) public {
-      require(_getImpersonator() == impersonator, 'only impersonator can update impersonator');
-      _impersonateMe(newImpersonator);
-      impersonator = _getImpersonator(); // should this be returned from impersonateMe?
+    function impersonateMe (address _newImpersonator) public returns (address) {
+      _impersonateMe(_newImpersonator);
+      return impersonator(); 
     }
 
     function increment() public returns (uint256) {
-      require(_getImpersonator() == impersonator, 'only impersonator can update count');
-      count += 1;
-      return count;
+      address impersonator = impersonator();
+      score[impersonator] += 1;
+      return score[impersonator];
+    }
+
+    function count(address account) public view returns (uint256) {
+      return score[account];
     }
 
     function whoami() public view returns (address) {
