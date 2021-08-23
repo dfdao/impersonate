@@ -94,7 +94,7 @@ describe("Game ", function () {
       daoGame = game.connect(dao);
     });
 
-    it("when owner is msg.sender dao is impersonator", async function () {
+    it("dao is impersonator", async function () {
       expect(await game.whoami()).to.equal(owner.address)
       expect(await game.impersonator()).to.equal(dao.address)
     });
