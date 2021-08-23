@@ -4,23 +4,26 @@
 
 pragma solidity ^0.8.0;
 
-// This is the main building block for smart contracts.
 contract Impersonate {
-    // Some string type variables to identify the token.
-    // The `public` modifier makes a variable readable from outside the contract.
+
     // TODO: understand indexed better
     event ImpersonationOccurred(address indexed player, address indexed impersonator);
 
     mapping(address => address) impersonations;
 
-    // no Constructor
+    // lookup for who is impersonating msg.sender
+    function _getImpersonator() internal view returns (address) {
+      // will be msg.sender if no one is impersonating msg.sender
+      return impersonations[msg.sender] != address(0) ? impersonations[msg.sender] : msg.sender;
+    }
+    
+    // msg.sender allows impersonator to impersonate them
+    function _impersonateMe(address newImpersonator) internal {
+      require(msg.sender != newImpersonator, 'cannot impersonate self');
 
-    function impersonateMe(address impersonator) public {
-      // msg.sender allows impersonator to impersonate them
-      require(msg.sender != impersonator, 'cannot impersonate self');
-      impersonations[msg.sender] = impersonator;
+      impersonations[msg.sender] = newImpersonator;
       // NOTE: currently only allows player to impersonate 1 address at a time.
-      emit ImpersonationOccurred(msg.sender, impersonator);
+      emit ImpersonationOccurred(msg.sender, newImpersonator);
     }
 
     // general lookup for who can impersonating who. 
@@ -29,9 +32,5 @@ contract Impersonate {
       return impersonations[player];
     }
 
-    // lookup for who is impersonating msg.sender
-    function _getImpersonator() public view returns (address) {
-      // will be msg.sender if no one is impersonating msg.sender
-      return impersonations[msg.sender] != address(0) ? impersonations[msg.sender] : msg.sender;
-    }
+
 }

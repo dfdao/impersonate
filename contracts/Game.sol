@@ -10,23 +10,19 @@ contract Game is Impersonate {
 
     uint256 public count = 0;
 
-    address public owner;
 
     constructor () {
-      owner = _getImpersonator(); // should be msg.sender to start.
+      impersonator = _getImpersonator(); // should be deployer msg.sender to start.
     }
 
-    function setOwner(address _owner) public {
-      require(_getImpersonator() == owner, '_getImpersonator is not owner');
-      // allows _owner to impersonate msg.sender
-      impersonateMe(_owner);
-      // sets owner to new impersonator for msg.sender
-      owner = _getImpersonator();
+    function impersonateMe (address newImpersonator) public {
+      require(_getImpersonator() == impersonator, 'only impersonator can update impersonator');
+      _impersonateMe(newImpersonator);
+      impersonator = _getImpersonator(); // should this be returned from impersonateMe?
     }
 
-    // only owner can update count
     function increment() public returns (uint256) {
-      require(_getImpersonator() == owner, '_getImpersonator is not owner');
+      require(_getImpersonator() == impersonator, 'only impersonator can update count');
       count += 1;
       return count;
     }
