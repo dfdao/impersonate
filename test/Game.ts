@@ -69,7 +69,6 @@ describe("Game ", function () {
 
       await game.impersonateMe(randomPlayer.address);
       expect(await game.impersonator()).to.equal(randomPlayer.address);
-      expect(await game.impersonator()).to.not.equal(dao.address);
     });
 
     it('impersonateMe emits ImpersonationOccurred event', async function () {
