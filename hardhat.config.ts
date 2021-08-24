@@ -7,13 +7,15 @@ import { HardhatUserConfig } from "hardhat/config";
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
-task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
-  const accounts = await hre.ethers.getSigners();
+task("balance", "Prints owner account's balance")
+  // .addParam("account", "The account's address")
+  .setAction(async (taskArgs, hre) => {
+    const [owner] = await hre.ethers.getSigners();
+    const balance = await hre.ethers.provider.getBalance(owner.address)
+    const niceBalance = hre.ethers.utils.formatEther(balance)
+    console.log(`myBalance: ${niceBalance}`);
 
-  for (const account of accounts) {
-    console.log(account.address);
-  }
-});
+  });
 
 const config: HardhatUserConfig = {
   // Your type-safe config goes here
