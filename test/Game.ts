@@ -50,23 +50,23 @@ describe("Game ", function () {
       expect(await daoGame.whoami()).to.equal(dao.address)
     });
     
-    it("owner can allow dao to impersonate", async function () {
-      await game.impersonateMe(dao.address);
+    it("dao can allow owner to impersonate", async function () {
+      await daoGame.impersonateMe(owner.address);
       expect(await game.impersonator()).to.equal(dao.address);
     });
 
-    it("owner can set dao as impersonator, then randomPlayer", async function () {
-      await game.impersonateMe(dao.address);
+    it("dao can set owner as impersonator, then randomPlayer", async function () {
+      await daoGame.impersonateMe(owner.address);
       expect(await game.impersonator()).to.equal(dao.address);
 
-      await game.impersonateMe(randomPlayer.address);
-      expect(await game.impersonator()).to.equal(randomPlayer.address);
+      await daoGame.impersonateMe(randomPlayer.address);
+      expect(await game.impersonator()).to.equal(dao.address);
     });
 
     it('impersonateMe emits ImpersonationOccurred event', async function () {
-        await expect(game.impersonateMe(dao.address))
-        .to.emit(game, 'ImpersonationOccurred').
-        withArgs(owner.address, dao.address); 
+        await expect(daoGame.impersonateMe(owner.address))
+        .to.emit(daoGame, 'ImpersonationOccurred').
+        withArgs(dao.address, owner.address); 
     })
  
   });
@@ -82,8 +82,9 @@ describe("Game ", function () {
       const GameFactory = await ethers.getContractFactory("Game");
       game = await GameFactory.deploy() as Game;
       await game.deployed();
-      await game.impersonateMe(dao.address);
       daoGame = game.connect(dao);
+      await daoGame.impersonateMe(owner.address);
+
     });
 
     it("dao is game impersonator", async function () {
