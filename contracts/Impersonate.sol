@@ -17,12 +17,13 @@ contract Impersonate {
       return impersonations[msg.sender] != address(0) ? impersonations[msg.sender] : msg.sender;
     }
     
-    // msg.sender allows impersonator to impersonate them
+    // msg.sender is allowign _newImpersonator to play for them
     function _impersonateMe(address _newImpersonator) internal {
-      require(msg.sender != _newImpersonator, 'cannot impersonate self');
+      require(_newImpersonator != msg.sender, 'cannot impersonate self');
 
-      impersonations[msg.sender] = _newImpersonator;
-      // NOTE: currently only allows player to impersonate 1 address at a time.
+      impersonations[_newImpersonator] = msg.sender;
+
+      // msg.sn_newImpersonator is impersonating msg.sender
       emit ImpersonationOccurred(msg.sender, _newImpersonator);
     }
 
