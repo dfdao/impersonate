@@ -19,7 +19,7 @@ describe("Game ", function () {
       const GameFactory = await ethers.getContractFactory("Game");
       game = await GameFactory.deploy() as Game;
       await game.deployed();
-      //daoGame is a new instance of game where dao is msg.sender
+      //daoGame --> dao is connected to game contract.
       daoGame = game.connect(dao); 
     });
 
@@ -28,36 +28,28 @@ describe("Game ", function () {
     });
 
     it("owner increments count from 0 to 1", async function () {
-      expect(await game.count()).to.equal(0)
+      expect(await game.count(owner.address)).to.equal(0)
 
       const incrementTx = await game.increment();
 
       // wait until the transaction is mined
       await incrementTx.wait();
 
-      expect(await game.count()).to.equal(1)
+      expect(await game.count(owner.address)).to.equal(1)
     });
 
     it("when owner is msg.sender, dao is not game impersonator", async function () {
       expect(await game.impersonator()).to.not.equal(dao.address)
     });
 
-    it("when dao is msg.sender, dao is not game impersonator", async function () {
-      expect(await daoGame.impersonator()).to.not.equal(dao.address)
+    it("when dao is msg.sender, dao is game impersonator", async function () {
+      expect(await daoGame.impersonator()).to.equal(dao.address)
     });
 
     it("dao is daoGame msg.sender", async function () {
       expect(await daoGame.whoami()).to.equal(dao.address)
     });
-
-    it("dao cannot impersonate randomPlayer b/c not curr impersonator", async function () {
-      await expect(daoGame.impersonateMe(randomPlayer.address)).to.be.revertedWith('only impersonator can update impersonator');
-    });
-
-    it("dao cannot increment b/c not curr impersonator", async function () {
-      await expect(daoGame.increment()).to.be.revertedWith('only impersonator can update count');
-    });
-
+    
     it("owner can allow dao to impersonate", async function () {
       await game.impersonateMe(dao.address);
       expect(await game.impersonator()).to.equal(dao.address);
@@ -94,23 +86,28 @@ describe("Game ", function () {
       daoGame = game.connect(dao);
     });
 
-    it("dao is impersonator", async function () {
+    it("dao is game impersonator", async function () {
       expect(await game.whoami()).to.equal(owner.address)
       expect(await game.impersonator()).to.equal(dao.address)
     });
 
-    it("when owner is msg.sender dao can increment", async function () {
-      expect(await game.count()).to.equal(0)
-      const incrementTx = await game.increment();
-      await incrementTx.wait();
-      expect(await game.count()).to.equal(1)
+    it("dao is daoGame impersonator", async function () {
+      expect(await daoGame.whoami()).to.equal(dao.address)
+      expect(await daoGame.impersonator()).to.equal(dao.address)
     });
 
-    it("when dao is msg.sender dao can increment", async function () {
-      expect(await daoGame.count()).to.equal(0)
+    it("when owner is msg.sender, can increment dao score", async function () {
+      expect(await game.count(dao.address)).to.equal(0)
+      const incrementTx = await game.increment();
+      await incrementTx.wait();
+      expect(await game.count(dao.address)).to.equal(1)
+    });
+
+    it("when dao is msg.sender dao can increment dao score", async function () {
+      expect(await daoGame.count(dao.address)).to.equal(0)
       const incrementTx = await daoGame.increment();
       await incrementTx.wait();
-      expect(await daoGame.count()).to.equal(1)
+      expect(await daoGame.count(dao.address)).to.equal(1)
     });
   });
 
