@@ -6,8 +6,8 @@ pragma solidity ^0.8.0;
 
 contract Impersonate {
 
-    // TODO: understand indexed better
-    event ImpersonationOccurred(address indexed player, address indexed impersonator);
+    event Impersonation(address indexed player, address indexed impersonator);
+    event ImpersonationRemoval(address indexed player, address indexed impersonator);
 
     mapping(address => address) impersonations;
 
@@ -17,14 +17,23 @@ contract Impersonate {
       return impersonations[msg.sender] != address(0) ? impersonations[msg.sender] : msg.sender;
     }
     
-    // msg.sender is allowign _newImpersonator to play for them
-    function _impersonateMe(address _newImpersonator) internal {
+    // msg.sender is allowing _newImpersonator to play for them
+    function impersonateMe(address _newImpersonator) public {
       require(_newImpersonator != msg.sender, 'cannot impersonate self');
 
       impersonations[_newImpersonator] = msg.sender;
 
-      // msg.sn_newImpersonator is impersonating msg.sender
-      emit ImpersonationOccurred(msg.sender, _newImpersonator);
+      // _newImpersonator is impersonating msg.sender
+      emit Impersonation(msg.sender, _newImpersonator);
+    }
+
+    function removeImpersonator(address _newImpersonator) public {
+      require(impersonations[_newImpersonator] == msg.sender, 'only current impersonator can remove themselves');
+
+      impersonations[_newImpersonator] = address(0);
+
+      // _newImpersonator is no longer impersonating msg.sender
+      emit ImpersonationRemoval(msg.sender, _newImpersonator);
     }
 
     // general lookup for who can impersonating who. 
