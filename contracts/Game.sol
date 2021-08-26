@@ -12,11 +12,6 @@ contract Game is Impersonate {
 
     constructor () {}
 
-    function impersonateMe (address _newImpersonator) public returns (address) {
-      _impersonateMe(_newImpersonator);
-      return impersonator(); 
-    }
-
     function increment() public returns (uint256) {
       address impersonator = impersonator();
       score[impersonator] += 1;
