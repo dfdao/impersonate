@@ -63,9 +63,9 @@ describe("Game ", function () {
       expect(await game.impersonator()).to.equal(dao.address);
     });
 
-    it('impersonateMe emits ImpersonationOccurred event', async function () {
+    it('impersonateMe emits Impersonation event', async function () {
         await expect(daoGame.impersonateMe(owner.address))
-        .to.emit(daoGame, 'ImpersonationOccurred').
+        .to.emit(daoGame, 'Impersonation').
         withArgs(dao.address, owner.address); 
     })
  
@@ -109,6 +109,16 @@ describe("Game ", function () {
       const incrementTx = await daoGame.increment();
       await incrementTx.wait();
       expect(await daoGame.count(dao.address)).to.equal(1)
+    });
+
+    it("owner cannot remove impersonation", async function () {
+      await expect(game.removeImpersonator(owner.address))
+        .to.be.revertedWith('only current impersonator can remove themselves')
+    });
+  
+    it("when dao is msg.sender dao can remove impersonation", async function () {
+      await daoGame.removeImpersonator(owner.address)
+      expect(await game.impersonator()).to.equal(owner.address)
     });
   });
 
